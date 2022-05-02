@@ -19,7 +19,6 @@ public struct AsyncOnElementSequence<Base: AsyncSequence>: AsyncSequence {
   public typealias Element = Base.Element
 
   public struct Iterator: AsyncIteratorProtocol {
-
     public typealias Element = Base.Element
 
     private var base: Base.AsyncIterator
