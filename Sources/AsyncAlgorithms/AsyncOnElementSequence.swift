@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 extension AsyncSequence {
-  public func onElement(perform sideEffect: @escaping @Sendable (Element) -> Void) -> AsyncOnElementSequence<Self> {
+  public func onElement(perform sideEffect: @escaping @Sendable (Element) async -> Void) -> AsyncOnElementSequence<Self> {
     AsyncOnElementSequence(base: self, sideEffect: sideEffect)
   }
 }
@@ -23,9 +23,9 @@ public struct AsyncOnElementSequence<Base: AsyncSequence>: AsyncSequence {
     public typealias Element = Base.Element
 
     private var base: Base.AsyncIterator
-    private let sideEffect: @Sendable (Element) -> Void
+    private let sideEffect: @Sendable (Element) async -> Void
 
-    init(base: Base.AsyncIterator, sideEffect: @escaping @Sendable (Element) -> Void) {
+    init(base: Base.AsyncIterator, sideEffect: @escaping @Sendable (Element) async -> Void) {
       self.base = base
       self.sideEffect = sideEffect
     }
@@ -34,15 +34,15 @@ public struct AsyncOnElementSequence<Base: AsyncSequence>: AsyncSequence {
       guard let element = try await base.next() else {
         return nil
       }
-      sideEffect(element)
+      await sideEffect(element)
       return element
     }
   }
 
   private let base: Base
-  private let sideEffect: @Sendable (Element) -> Void
+  private let sideEffect: @Sendable (Element) async -> Void
 
-  init(base: Base, sideEffect: @escaping @Sendable (Element) -> Void) {
+  init(base: Base, sideEffect: @escaping @Sendable (Element) async -> Void) {
     self.base = base
     self.sideEffect = sideEffect
   }
